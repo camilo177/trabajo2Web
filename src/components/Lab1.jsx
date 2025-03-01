@@ -3,14 +3,12 @@ import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { OrbitControls } from "@react-three/drei";
 
-const Lab1 = () => {
-  // Load textures for each figure from the /assets folder
-  const cubeAlbedo = useLoader(TextureLoader, "/assets/cube_albedo.jpg");
-  const cubeAlpha = useLoader(TextureLoader, "/assets/cube_alpha.png");
-  const sphereTexture = useLoader(TextureLoader, "/assets/sphere_texture.jpg");
-  const coneTexture = useLoader(TextureLoader, "/assets/cone_texture.jpg");
-  const torusTexture = useLoader(TextureLoader, "/assets/torus_texture.jpg");
-  const cylinderTexture = useLoader(TextureLoader, "/assets/cylinder_texture.jpg");
+// Scene component: All R3F hooks are called here, inside the Canvas context.
+const Scene = () => {
+  // Load available textures from the /assets folder
+  const cubeTexture = useLoader(TextureLoader, "/assets/texture1.jpg");
+  const sphereTexture = useLoader(TextureLoader, "/assets/texture2.jpg");
+  const alphaTexture = useLoader(TextureLoader, "/assets/alpha.png");
 
   // Create a ref for the sphere to animate its rotation
   const sphereRef = useRef();
@@ -22,49 +20,49 @@ const Lab1 = () => {
   });
 
   return (
-    <Canvas camera={{ position: [0, 5, 15], fov: 50 }} shadows>
-      {/* Lighting: ambient light for overall illumination and a directional light that casts shadows */}
+    <>
+      {/* Lighting: ambient light for overall illumination and directional light that casts shadows */}
       <ambientLight intensity={0.4} />
       <directionalLight position={[10, 10, 10]} intensity={1} castShadow />
 
-      {/* OrbitControls: allows interactive camera movement (rotate, pan, zoom) */}
+      {/* OrbitControls: enables interactive camera movement (rotate, pan, zoom) */}
       <OrbitControls />
 
-      {/* Cube: Demonstrates dual texturing with an albedo and an alpha texture for transparency */}
+      {/* Cube: Uses dual textures (albedo and alpha) */}
       <mesh position={[-6, 2, 0]} castShadow>
         <boxGeometry args={[2, 2, 2]} />
         <meshStandardMaterial
-          map={cubeAlbedo}
-          alphaMap={cubeAlpha}
+          map={cubeTexture}
+          alphaMap={alphaTexture}
           transparent={true}
         />
       </mesh>
 
-      {/* Sphere: Has a texture and a slight rotation animation (using useFrame) */}
+      {/* Sphere: Has a texture and a slight rotation animation */}
       <mesh ref={sphereRef} position={[-2, 2, 0]} castShadow>
         <sphereGeometry args={[1.5, 32, 32]} />
         <meshStandardMaterial map={sphereTexture} />
       </mesh>
 
-      {/* Cone: Applies a texture to showcase another geometry type */}
+      {/* Cone: Uses cubeTexture */}
       <mesh position={[2, 2, 0]} castShadow>
         <coneGeometry args={[1, 3, 32]} />
-        <meshStandardMaterial map={coneTexture} />
+        <meshStandardMaterial map={cubeTexture} />
       </mesh>
 
-      {/* Torus (doughnut shape): Uses its own texture */}
+      {/* Torus: Uses sphereTexture */}
       <mesh position={[6, 2, 0]} castShadow>
         <torusGeometry args={[1, 0.3, 16, 100]} />
-        <meshStandardMaterial map={torusTexture} />
+        <meshStandardMaterial map={sphereTexture} />
       </mesh>
 
-      {/* Cylinder: Uses a dedicated texture */}
+      {/* Cylinder: Uses cubeTexture */}
       <mesh position={[0, -2, 0]} castShadow>
         <cylinderGeometry args={[1, 1, 3, 32]} />
-        <meshStandardMaterial map={cylinderTexture} />
+        <meshStandardMaterial map={cubeTexture} />
       </mesh>
 
-      {/* Ground Plane: A large horizontal plane that receives shadows to ground the scene */}
+      {/* Ground Plane: A large horizontal plane that receives shadows */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, -3.5, 0]}
@@ -73,6 +71,14 @@ const Lab1 = () => {
         <planeGeometry args={[50, 50]} />
         <meshStandardMaterial color="lightgray" />
       </mesh>
+    </>
+  );
+};
+
+const Lab1 = () => {
+  return (
+    <Canvas camera={{ position: [0, 5, 15], fov: 50 }} shadows>
+      <Scene />
     </Canvas>
   );
 };
